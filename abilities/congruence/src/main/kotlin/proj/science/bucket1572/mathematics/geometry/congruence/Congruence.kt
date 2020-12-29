@@ -1,4 +1,4 @@
-// TODO: 2020-12-29 wand 꾸미기, 파티클 입히기 
+// TODO: 2020-12-29 효과 / 연출
 package proj.science.bucket1572.mathematics.geometry.congruence
 
 import com.github.noonmaru.psychics.AbilityConcept
@@ -33,10 +33,10 @@ class CongruenceConcept : AbilityConcept() {
         val star = ItemStack(Material.NETHER_STAR, 1)
         star.apply {
             val meta = itemMeta
-            meta.setDisplayName("${ChatColor.RESET}합동")
+            meta.setDisplayName("${ChatColor.GOLD}${ChatColor.BOLD}합동")
             meta.addEnchant(Enchantment.SILK_TOUCH, 1, false)
             meta.lore = listOf(
-                "합동인 두 도형은 모양과 크기가 같습니다."
+                "한 능력을 연속 두 번 쓸 수 있는 기하의 특수기"
             )
             meta.isPsychicbound = true
             itemMeta = meta
@@ -48,7 +48,9 @@ class CongruenceConcept : AbilityConcept() {
         description = listOf(
             "자신의 능력 중 하나를 복제할 수 있습니다.",
             "복사 된 능력은 ${addedCost}만큼 비용이 증가합니다.",
-            "${ChatColor.ITALIC}단, 패시브 능력은 복사할 수 없습니다."
+            "${ChatColor.RED}${ChatColor.BOLD}단, 패시브 능력은 복사할 수 없습니다.",
+            "",
+            "${ChatColor.ITALIC}삼각형의 합동 조건 : SSS, ASA, SAS"
         )
     }
 }
@@ -64,9 +66,6 @@ class Congruence : ActiveAbility<CongruenceConcept>(), Listener {
     }
 
     override fun onEnable() {
-        for (supply in concept.supplyItems) {
-            esper.player.inventory.addItem(supply)
-        }
         psychic.registerEvents(this)
     }
 
@@ -74,7 +73,7 @@ class Congruence : ActiveAbility<CongruenceConcept>(), Listener {
         if (copiedAbility == null) {
             val abilities = esper.psychic!!.abilities
             val centerCount: Int = abilities.size
-            val nullItem : ItemStack = ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1)
+            val nullItem = ItemStack(Material.BLACK_STAINED_GLASS_PANE, 1)
             nullItem.apply {
                 val meta = itemMeta
                 meta.setDisplayName(" ")
@@ -83,9 +82,21 @@ class Congruence : ActiveAbility<CongruenceConcept>(), Listener {
             for (i in 0..8) {
                 if (i < 4 - centerCount / 2) {
                     menu.setItem(i, nullItem)
-                } else if (i < 4 + centerCount / 2) {
-                    val idx: Int = i - (4 - centerCount / 2)
-                    menu.setItem(i, abilities.get(idx).concept.wand)
+                } else if (i <= 4 + centerCount / 2) {
+                    if (centerCount % 2 == 0) {
+                        if (i < 4) {
+                            val idx: Int = i - (4 - centerCount / 2)
+                            menu.setItem(i, abilities.get(idx).concept.wand)
+                        } else if (i > 4) {
+                            val idx: Int = i - (4 - centerCount / 2) - 1
+                            menu.setItem(i, abilities.get(idx).concept.wand)
+                        } else {
+                            menu.setItem(i, nullItem)
+                        }
+                    } else {
+                        val idx: Int = i - (4 - centerCount / 2)
+                        menu.setItem(i, abilities.get(idx).concept.wand)
+                    }
                 } else {
                     menu.setItem(i, nullItem)
                 }
@@ -107,7 +118,7 @@ class Congruence : ActiveAbility<CongruenceConcept>(), Listener {
 
         val item: ItemStack = event.currentItem ?: return
 
-        if (!item.type.equals(Material.BLACK_STAINED_GLASS_PANE) and !item.equals(concept.wand)) {
+        if ((item.type != Material.BLACK_STAINED_GLASS_PANE) and (item != concept.wand)) {
             val copyAbility = esper.psychic!!.getAbilityByWand(item)!!
 
             if (copyAbility.concept.type == AbilityType.ACTIVE) {

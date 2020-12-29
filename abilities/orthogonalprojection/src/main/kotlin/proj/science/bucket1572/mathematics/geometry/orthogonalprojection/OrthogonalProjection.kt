@@ -1,4 +1,4 @@
-// TODO: 2020-12-29 wand 꾸미기, 파티클 입히기 
+// TODO: 2020-12-29 효과 / 연출
 package proj.science.bucket1572.mathematics.geometry.orthogonalprojection
 
 import com.github.noonmaru.psychics.AbilityConcept
@@ -17,6 +17,9 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Particle
 import org.bukkit.enchantments.Enchantment
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.inventory.ItemStack
 
@@ -53,10 +56,10 @@ class OrthoProjConcept : AbilityConcept() {
         val sunLight = ItemStack(Material.SUNFLOWER, 1)
         sunLight.apply {
             val meta = itemMeta
-            meta.setDisplayName("태양 광선")
+            meta.setDisplayName("${ChatColor.DARK_RED}${ChatColor.BOLD}태양 광선")
             meta.addEnchant(Enchantment.CHANNELING, 1, false)
             meta.lore = listOf(
-                "태양 광선은 지구에 평행하게 입사합니다."
+                "태양 광선으로 그림자를 만드는 기하의 공격기"
             )
             meta.isPsychicbound = true
             itemMeta = meta
@@ -68,15 +71,16 @@ class OrthoProjConcept : AbilityConcept() {
         description = listOf(
             "자신보다 높이 있는 반경 $range 칸 안의 엔티티를",
             "${castingTicks / 20.0}초 이후",
-            "지면으로 떨어뜨립니다. 이때 엔티티의 낙하 거리가 $minFallDistance 보다 크다면",
+            "지면에 떨어뜨립니다. 이때 엔티티의 낙하 거리가 $minFallDistance 보다 크다면",
             "해당 엔티티는 추가 낙하 거리 당 $damageByFalling 의 낙하 피해를 입습니다.",
+            "한 칸짜리 두께의 지면 위의 엔티티는 그 지면을 뚫고 떨어집니다.",
             "",
             "${ChatColor.ITALIC}정사영은 수선의 발의 집합"
         )
     }
 }
 
-class OrthogonalProjection : ActiveAbility<OrthoProjConcept>() {
+class OrthogonalProjection : ActiveAbility<OrthoProjConcept>(), Listener {
     init {
         targeter = {
             esper.player.location
@@ -84,9 +88,7 @@ class OrthogonalProjection : ActiveAbility<OrthoProjConcept>() {
     }
 
     override fun onEnable() {
-        for (supply in concept.supplyItems) {
-            esper.player.inventory.addItem(supply)
-        }
+        psychic.registerEvents(this)
     }
 
     override fun onCast(event: PlayerEvent, action: WandAction, target: Any?) {
@@ -125,4 +127,20 @@ class OrthogonalProjection : ActiveAbility<OrthoProjConcept>() {
         }
     }
 
+    @EventHandler
+    fun onBlockPlace(event: BlockPlaceEvent) {
+        var placingItem: ItemStack = event.player.inventory.itemInMainHand
+        if (placingItem.type.isAir) {
+            placingItem = event.player.inventory.itemInOffHand
+            if (placingItem.type.isAir) {
+                return
+            }
+        }
+
+        if ((placingItem.itemMeta == concept.wand!!.itemMeta) and
+            (placingItem.type == concept.wand!!.type)
+        ) {
+            event.isCancelled = true
+        }
+    }
 }

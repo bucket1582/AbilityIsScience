@@ -5,7 +5,7 @@ AbilityIsScience
 [이과 과목들](http://www.edunet.net/nedu/ncicsvc/listSub2015Form.do?menu_id=623 "한국 고등학교 2015년 개정 교육과정 기준")로 구성 
 된 마인크래프트 초능력자 플러그인입니다. 
 [Psychics](https://github.com/noonmaru/psychics "")를 활용하여 개발되었습니다.  
-고등학교의 분류 체계를 존중하여, 다음과 같이 초능력을 분류하였습니다.
+고등학교의 분류 체계를 고려하여, 다음과 같이 초능력을 분류하였습니다.
 1. 수학과
 2. 물리학과
 3. 화학과
