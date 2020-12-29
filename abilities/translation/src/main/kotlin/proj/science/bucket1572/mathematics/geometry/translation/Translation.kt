@@ -1,4 +1,3 @@
-// TODO: 2020-12-29 효과 / 연출 
 package proj.science.bucket1572.mathematics.geometry.translation
 
 import com.github.noonmaru.psychics.AbilityConcept
